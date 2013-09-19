@@ -13,7 +13,7 @@ void testApp::setup(){
     
     //setup video grabber
     video.listDevices();
-    bVideoSetup = video.initGrabber( 1024, 768 );
+    bVideoSetup = video.initGrabber(800, 600);
     
     ofxLibwebsockets::ServerOptions options = ofxLibwebsockets::defaultServerOptions();
     options.port = 9093;
@@ -39,7 +39,8 @@ void testApp::update(){
         unsigned long size;
         ofImage currentImage;
         currentImage.setFromPixels(video.getPixelsRef());
-        unsigned char * compressed = turbo.compress(&currentImage,100,&size);
+        currentImage.mirror(false,true);
+        unsigned char * compressed = turbo.compress(&currentImage,80,&size);
         server.sendBinary(compressed, size);
         free(compressed);
     }
@@ -55,6 +56,7 @@ void testApp::draw(){
         y += font.stringHeight( messages[i] ) + font.getSize();
     }
     if ( bVideoSetup ) video.draw(0,0);
+      ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 10, 15);
 }
 
 //--------------------------------------------------------------

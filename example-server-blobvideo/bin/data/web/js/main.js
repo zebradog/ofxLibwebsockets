@@ -7,6 +7,7 @@ var canvasData;
 var data;
 var type;
 var stats;
+var image;
 var URL = window.URL ? window.URL : window.webkitURL;
 
 //----------------------------------------------------------------------------------------------------------------
@@ -16,6 +17,8 @@ var URL = window.URL ? window.URL : window.webkitURL;
 $(document).ready( function() {
 	canvas 		= document.getElementById('contourCanvas');
 	ctx			= canvas.getContext('2d');
+    
+    image = new Image();
 
     canvasData = ctx.getImageData(0,0,canvas.width, canvas.height);
     data = canvasData.data;
@@ -59,20 +62,24 @@ function onClose(){
 // WS: ON MESSAGE
 //----------------------------------------------------------------------------------------------------------------
 
-var prevBlob; 
+var prevBlob;
 function onMessage( messageEvent ){
     stats.end();
+    socket.onmessage = null;
     if (messageEvent.data instanceof Blob) {
-      //blob:blobinternals created automatically by Chrome are not cleared
-       URL.revokeObjectURL(prevBlob);
-		image = new Image();
-		image.onload = function () {
-            ctx.drawImage(image, 0, 0);
-        }
-        prevBlob = URL.createObjectURL(messageEvent.data);
-        image.src = prevBlob;
+      ctx.drawImage(image, 0, 0);
+      URL.revokeObjectURL(prevBlob);
+      prevBlob = URL.createObjectURL(messageEvent.data);
+      image.src = prevBlob;
+      setTimeout(poll,1000 / 60);
 	}
     stats.begin();
+}
+
+
+
+function poll(){
+  socket.onmessage = onMessage;
 }
 
 //----------------------------------------------------------------------------------------------------------------
@@ -93,8 +100,9 @@ function setupSocket(){
 	// open
 	try {
 		socket.onopen 		= onOpen;
-		socket.onmessage 	= onMessage;
+		//socket.onmessage 	= onMessage;
 		socket.onclose 	 	= onClose;
+        setTimeout(poll,1000 / 60);
 	} catch(exception) {
 		alert('Error' + exception);  
 	}
