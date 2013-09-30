@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include "ofMain.h"
+//#include "ofMain.h"
 #include <libwebsockets.h>
 
+#include <iostream.h>
 #include <vector>
 #include <string>
 
@@ -48,6 +49,7 @@ namespace ofxLibwebsockets {
         std::string getClientIP();
         std::string getClientName();
         
+        libwebsocket_context* context;
         libwebsocket* ws;
         Reactor*  reactor;
         Protocol* protocol;
